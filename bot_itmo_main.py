@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 import sqlite3
 
-bot = telebot.TeleBot('token')
+bot = telebot.TeleBot('6586590304:AAHHQMz6Enb7YASXX-1zcur6dmGqQOTeHiw')
 
 score21_user, score21_bot = 0, 0
 login = None
@@ -18,6 +18,25 @@ admins = [747864333]
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
+    connect = sqlite3.connect('itmohelpbot.sql')  # создание базы
+    curbaz = connect.cursor()
+    curbaz.execute('SELECT * FROM users')
+    users = curbaz.fetchall()
+    if len(users) % 10 <= 1 or len(users) % 10 >= 5:
+        len_users_text_grammar = 'человек'
+    else:
+        len_users_text_grammar = 'человека'
+    bot.send_message(message.chat.id,
+                     f'<b>Привет</b>, {message.from_user.first_name} •⩊•! \nЯ твой бот-помощник по сайтам'
+                     f' итмо. \nВ нашей команде уже: ' + str(
+                         len(users)) + ' ' + len_users_text_grammar +  '\nЧтобы узнать мои функции введи /help\nНапиши мне '
+                                       '/reg, чтобы войти в ИТМО',
+                     parse_mode='html')
+
+    menu(message)
+
+
+def menu(message):
     mark = types.ReplyKeyboardMarkup()
     btn1 = types.KeyboardButton('Профиль💻')
     btn2 = types.KeyboardButton('Расписание🗓')
@@ -31,25 +50,7 @@ def start_message(message):
     mark.row(btn4, btn5)
     mark.row(btn6)
     mark.row(btn7)
-    connect = sqlite3.connect('itmohelpbot.sql')  # создание базы
-    curbaz = connect.cursor()
-    curbaz.execute('SELECT * FROM users')
-    users = curbaz.fetchall()
-    if len(users) % 10 <= 1 or len(users) % 10 >= 5:
-        bot.send_message(message.chat.id,
-                         f'<b>Привет</b>, {message.from_user.first_name} •⩊•! \nЯ твой бот-помощник по сайтам'
-                         f' итмо. \nВ нашей команде уже: ' + str(
-                             len(users)) + ' человек \nЧтобы узнать мои функции введи /help\nНапиши мне '
-                                           '/reg, чтобы войти в ИТМО',
-                         parse_mode='html', reply_markup=mark)
-    else:
-        bot.send_message(message.chat.id,
-                         f'<b>Привет</b>, {message.from_user.first_name} •⩊•! \nЯ твой бот-помощник по сайтам итмо.'
-                         f' \nВ нашей команде уже: ' + str(
-                             len(users)) + ' человека \nЧтобы узнать мои функции введи /help'
-                                           '\nНапиши мне /reg, чтобы войти в ИТМО',
-                         parse_mode='html', reply_markup=mark)
-
+    bot.send_message(message.chat.id, 'Вы в меню!', reply_markup=mark)
 
 @bot.message_handler(commands=['reg'])
 def registration(message):
@@ -87,20 +88,8 @@ def registration(message):
 def user_login_registration(message):
     global login
     if message.text.lower() == 'отмена':
-        mark = types.ReplyKeyboardMarkup()
-        btn1 = types.KeyboardButton('Профиль💻')
-        btn2 = types.KeyboardButton('Расписание🗓')
-        btn3 = types.KeyboardButton('Ссылки🔗')
-        btn4 = types.KeyboardButton('Помощь🆘')
-        btn5 = types.KeyboardButton('Погода⛅️')
-        btn6 = types.KeyboardButton('Игры🎮️')
-        btn7 = types.KeyboardButton('Пожелание📝')
-        mark.row(btn1, btn2)
-        mark.row(btn3)
-        mark.row(btn4, btn5)
-        mark.row(btn6)
-        mark.row(btn7)
-        bot.send_message(message.chat.id, 'Регистрация отменена', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Регистрация отменена')
+        menu(message)
     else:
         login = message.text.strip()
         bot.send_message(message.chat.id, 'Введи пароль!', parse_mode='html')
@@ -108,21 +97,9 @@ def user_login_registration(message):
 
 
 def user_password_registration(message):
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('Игры🎮️')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
     if message.text.lower() == 'отмена':
-        bot.send_message(message.chat.id, 'Регистрация отменена', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Регистрация отменена')
+        menu(message)
     else:
         passw = message.text.strip()
         connect = sqlite3.connect('itmohelpbot.sql')
@@ -133,7 +110,8 @@ def user_password_registration(message):
         connect.commit()
         cursor.close()
         connect.close()
-        bot.send_message(message.chat.id, 'Регистрация прошла успешно!', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Регистрация прошла успешно!')
+        menu(message)
 
 
 @bot.message_handler(commands=['new_login'])
@@ -143,21 +121,9 @@ def new_user_login(message):
 
 
 def new_user_login_for_replace(message):
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('Игры🎮️')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
     if message.text.lower() == 'отмена':
-        bot.send_message(message.chat.id, 'Отменено', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Отменено')
+        menu(message)
     else:
         newlog = message.text.strip()
         sqlite_connection = sqlite3.connect('itmohelpbot.sql')
@@ -167,7 +133,8 @@ def new_user_login_for_replace(message):
 
         sqlite_connection.commit()
         cursor.close()
-        bot.send_message(message.chat.id, 'Логин изменен!', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Логин изменен!')
+        menu(message)
 
 
 @bot.message_handler(commands=['new_pass'])
@@ -177,21 +144,9 @@ def new_user_password(message):
 
 
 def new_user_password_for_replace(message):
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('Игры🎮️')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
     if message.text.lower() == 'отмена':
-        bot.send_message(message.chat.id, 'Отменено', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Отменено')
+        menu(message)
     else:
         new_password = message.text.strip()
         sqlite_connection = sqlite3.connect('itmohelpbot.sql')
@@ -201,11 +156,12 @@ def new_user_password_for_replace(message):
 
         sqlite_connection.commit()
         cursor.close()
-        bot.send_message(message.chat.id, 'Пароль изменен! ✅', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Пароль изменен! ✅')
+        menu(message)
 
 
 @bot.message_handler(commands=['help'])
-def helpmes(message):
+def help_message(message):
     message_for_user_1 = '\n\n0) Я реагирую на любой регистр букв, можешь писать слова любыми буквами'
     message_for_user_2 = '\n\n1) Написав мне слово "ссылки", ты получишь важные ссылки, связанные с ИТМО'
     message_for_user_3 = '\n\n2) Напиши мне ключевые слова ссылок и я тебе их скину'
@@ -247,7 +203,7 @@ def get_text_messages(message):
         mark.row(btn1)
         mark.row(btn2)
         bot.send_message(message.chat.id, 'Введи свое пожелание и я отправлю его админу', reply_markup=mark)
-        bot.register_next_step_handler(message, poj)
+        bot.register_next_step_handler(message, users_wish)
 
     elif message.text.lower() == 'расписание🗓':
         message_random = random.randint(0, 4)
@@ -432,9 +388,9 @@ def get_text_messages(message):
                          + '\n' + '-' + '\n' + '<b>Давление:</b> ' + pressure_weather_info.text, parse_mode='html')
 
     elif message.text.lower() == 'помощь🆘':
-        helpmes(message)
+        help_message(message)
     elif message.text.lower() == 'хелп':
-        helpmes(message)
+        help_message(message)
 
     elif message.text.lower() == 'итмо':
         bot.send_message(message.chat.id, 'Главный сайт - https://itmo.ru/')
@@ -607,21 +563,8 @@ def edit_profile(message):
     markup = types.ReplyKeyboardMarkup()
     btn10 = types.KeyboardButton('Отмена')
     markup.row(btn10)
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('🪨✂️🧻')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
     if message.text.lower() == 'вернуться в меню':
-        bot.send_message(message.chat.id, 'Вы в меню!', reply_markup=mark)
+        menu(message)
     elif message.text.lower() == 'изменить логин🗓🆕':
         bot.send_message(message.chat.id, 'Смена Логина', reply_markup=markup)
         new_user_login(message)
@@ -634,7 +577,8 @@ def edit_profile(message):
         id = message.chat.id
         curbaz.execute('''DELETE FROM users WHERE uid = ?''', (id,))
         connect.commit()
-        bot.send_message(message.chat.id, 'Профиль удален', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Профиль удален')
+        menu(message)
     else:
         bot.send_message(message.chat.id, 'Выбери действие из кнопок!')
         bot.register_next_step_handler(message, edit_profile)
@@ -644,21 +588,8 @@ def games(message):
     markup = types.ReplyKeyboardMarkup()
     btn10 = types.KeyboardButton('Отмена')
     markup.row(btn10)
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('Игры🎮️')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
     if message.text.lower() == 'вернуться в меню':
-        bot.send_message(message.chat.id, 'Вы в меню!', reply_markup=mark)
+        menu(message)
     elif message.text.lower() == '21':
         # markup = types.ReplyKeyboardMarkup()
         # btn10 = types.KeyboardButton('Еще')
@@ -691,27 +622,15 @@ def games(message):
         bot.register_next_step_handler(message, games)
 
 
-def poj(message):
-    mark = types.ReplyKeyboardMarkup()
-    btn1 = types.KeyboardButton('Профиль💻')
-    btn2 = types.KeyboardButton('Расписание🗓')
-    btn3 = types.KeyboardButton('Ссылки🔗')
-    btn4 = types.KeyboardButton('Помощь🆘')
-    btn5 = types.KeyboardButton('Погода⛅️')
-    btn6 = types.KeyboardButton('Игры🎮️')
-    btn7 = types.KeyboardButton('Пожелание📝')
-    mark.row(btn1, btn2)
-    mark.row(btn3)
-    mark.row(btn4, btn5)
-    mark.row(btn6)
-    mark.row(btn7)
+def users_wish(message):
     if message.text.lower() == 'отмена':
-        bot.send_message(message.chat.id, 'Пожелание отменено', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Пожелание отменено')
+        menu(message)
     elif message.text.lower() == 'что такое пожелание?':
         bot.send_message(message.chat.id, '<b>Пожелание</b> - это возможность задать вопрос моему админу, попросить '
                                           'добавить мне новые функции или же просто выразить свою благодарность.'
                                           '\n<b>Админ</b> ответит как только сможет', parse_mode='html')
-        bot.register_next_step_handler(message, poj)
+        bot.register_next_step_handler(message, users_wish)
     else:
         s = message.text
         s = s.lower()
@@ -719,7 +638,8 @@ def poj(message):
         s = '"' + s + '"'
         bot.send_message(747864333, 'Пожелание от ' + str(message.chat.id) + ': ' + s + '\nПользователь: ' + str(
             message.from_user.first_name))
-        bot.send_message(message.chat.id, 'Пожелание отправлено админу ✅, он ответит по-возможности', reply_markup=mark)
+        bot.send_message(message.chat.id, 'Пожелание отправлено админу ✅, он ответит по-возможности')
+        menu(message)
 
 
 # -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-  Callback БОТА _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -851,11 +771,11 @@ def callback_mess(callback):
                          'Itmo Lifesafety (БЖД) - https://lifesafety.itmo.ru/m/my/', parse_mode='html')
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
     elif callback.data == 'github':
-        bot.send_message(callback.message.chat.id, 'https://github.com/WALTANN/ItmoHelper_bot')
+        bot.send_message(callback.message.chat.id, 'https://github.com/WALTANN/ItmoHelper-bot')
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
     elif callback.data == 'txt':
         bot.send_message(callback.message.chat.id,
-                         "Код пока не выложен :((, но ты можешь посмотреть его на GitHub'е - https://github.com/WALTANN/ItmoHelper_bot")
+                         "Код пока не выложен :((, но ты можешь посмотреть его на GitHub'е - https://github.com/WALTANN/ItmoHelper-bot")
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 
