@@ -851,11 +851,11 @@ def callback_mess(callback):
                          'Itmo Lifesafety (БЖД) - https://lifesafety.itmo.ru/m/my/', parse_mode='html')
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
     elif callback.data == 'github':
-        bot.send_message(callback.message.chat.id, 'https://github.com/WALTANN/ItmoHelper-bot')
+        bot.send_message(callback.message.chat.id, 'https://github.com/WALTANN/ItmoHelper_bot')
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
     elif callback.data == 'txt':
         bot.send_message(callback.message.chat.id,
-                         "Код пока не выложен :((, но ты можешь посмотреть его на GitHub'е - https://github.com/WALTANN/ItmoHelper-bot")
+                         "Код пока не выложен :((, но ты можешь посмотреть его на GitHub'е - https://github.com/WALTANN/ItmoHelper_bot")
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
 
 
